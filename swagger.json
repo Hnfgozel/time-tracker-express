@@ -24,8 +24,8 @@
       "description": "Users endpoints"
     },
     {
-      "name": "Projects",
-      "description": "Projects endpoints"
+      "name": "tasks",
+      "description": "tasks endpoints"
     }
   ],
   "consumes": ["application/json"],
@@ -106,31 +106,31 @@
         }
       }
     },
-    "/api/projects": {
+    "/api/tasks": {
       "get": {
-        "tags": ["Projects"],
-        "summary": "Get all projects in database",
+        "tags": ["tasks"],
+        "summary": "Get all tasks in database",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Projects"
+              "$ref": "#/definitions/tasks"
             }
           }
         }
       }
     },
-    "/api/projects/start": {
+    "/api/tasks/start": {
       "post": {
-        "tags": ["Projects"],
+        "tags": ["tasks"],
         "summary": "Create a new work",
         "requestBody": {
-          "description": "Project Object",
+          "description": "task Object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/definitions/Project"
+                "$ref": "#/definitions/task"
               }
             }
           }
@@ -155,17 +155,17 @@
         }
       }
     },
-    "/api/projects/stop": {
+    "/api/tasks/stop": {
       "post": {
-        "tags": ["Projects"],
+        "tags": ["tasks"],
         "summary": "Stop work",
         "requestBody": {
-          "description": "Project Object",
+          "description": "task Object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/definitions/Project"
+                "$ref": "#/definitions/task"
               }
             }
           }
@@ -184,17 +184,17 @@
         }
       }
     },
-    "/api/projects/export": {
+    "/api/tasks/export": {
       "post": {
-        "tags": ["Projects"],
+        "tags": ["tasks"],
         "summary": "Export work data",
         "requestBody": {
-          "description": "Project Object",
+          "description": "task Object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/definitions/Project"
+                "$ref": "#/definitions/task"
               }
             }
           }
@@ -213,19 +213,19 @@
         }
       }
     },
-    "/api/projects/{id}": {
+    "/api/tasks/{id}": {
       "parameters": [
         {
           "name": "id",
           "in": "path",
           "required": true,
-          "description": "project ID",
+          "description": "task ID",
           "type": "string"
         }
       ],
       "delete": {
         "summary": "Delete work by id",
-        "tags": ["Projects"],
+        "tags": ["tasks"],
         "parameters": [
           {
             "in": "path",
@@ -262,7 +262,7 @@
         "username": {
           "type": "string"
         },
-        "projectsRef": {
+        "tasksRef": {
           "type": "array"
         }
       }
@@ -278,7 +278,7 @@
         }
       }
     },
-    "Project": {
+    "task": {
       "type": "object",
       "properties": {
         "description": {
@@ -289,13 +289,13 @@
         }
       }
     },
-    "Projects": {
+    "tasks": {
       "type": "object",
       "properties": {
-        "projects": {
+        "tasks": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/Project"
+            "$ref": "#/definitions/task"
           }
         }
       }

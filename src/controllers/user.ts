@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import userModel from '../models/user';
 
 const getUsers = async (req: Request, res: Response) => {
-    const users = await userModel.find({}).populate('projectsRef').exec();
+    const users = await userModel.find({}).populate('tasksRef').exec();
     if (users.length > 0) {
         res.status(200).json(users);
     } else {

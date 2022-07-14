@@ -30,11 +30,11 @@ const UserSchema = new mongoose_1.Schema({
         required: true,
         unique: true
     },
-    projectsRef: {
+    tasksRef: {
         type: [
             {
                 type: mongoose_1.Schema.Types.ObjectId,
-                ref: 'projects',
+                ref: 'tasks',
             },
         ],
         default: [],

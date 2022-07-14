@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface Project {
+interface task {
     description: string;
     startDate: string;
     workingTime: number;
@@ -9,7 +9,7 @@ interface Project {
     isStopped: boolean;
 }
 
-const ProjectSchema = new Schema<Project>({
+const taskSchema = new Schema<task>({
     description: {
         type: String,
         required: true
@@ -38,6 +38,6 @@ const ProjectSchema = new Schema<Project>({
     }
 }, { timestamps: true });
 
-const Project = mongoose.model("projects", ProjectSchema);
+const task = mongoose.model("tasks", taskSchema);
 
-export default Project;
+export default task;

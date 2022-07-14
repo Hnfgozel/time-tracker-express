@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.createUser = exports.getUsers = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_1.default.find({}).populate('projectsRef').exec();
+    const users = yield user_1.default.find({}).populate('tasksRef').exec();
     if (users.length > 0) {
         res.status(200).json(users);
     }

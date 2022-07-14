@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
-const project_1 = require("../controllers/project");
-router.get("/", project_1.getProjects);
-router.post("/start", project_1.startWork);
-router.post("/stop", project_1.stopWork);
-router.post("/export", project_1.exportWork);
-router.delete("/:id", project_1.deleteWork);
+const task_1 = require("../controllers/task");
+router.get("/", task_1.gettasks);
+router.post("/start", task_1.startWork);
+router.post("/stop", task_1.stopWork);
+router.post("/export", task_1.exportWork);
+router.delete("/:id", task_1.deleteWork);
 exports.default = router;

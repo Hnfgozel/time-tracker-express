@@ -3,9 +3,9 @@ import express from 'express';
 const router = express.Router();
 
 import userRouter from './user';
-import projectRouter from './project';
+import taskRouter from './task';
 
 router.use('/users', userRouter);
-router.use('/projects', projectRouter);
+router.use('/tasks', taskRouter);
 
 export default router;

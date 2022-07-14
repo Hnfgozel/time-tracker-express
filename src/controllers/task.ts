@@ -2,15 +2,15 @@ import { Request, Response } from 'express';
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-import projectModel from '../models/project';
+import taskModel from '../models/task';
 import userModel from '../models/user';
 
-const getProjects = async (req: Request, res: Response) => {
-    const projects = await projectModel.find({}).populate('userRef').exec();
-    if (projects.length > 0) {
-        res.status(200).json(projects);
+const gettasks = async (req: Request, res: Response) => {
+    const tasks = await taskModel.find({}).populate('userRef').exec();
+    if (tasks.length > 0) {
+        res.status(200).json(tasks);
     } else {
-        res.status(200).json('projects not found');
+        res.status(200).json('tasks not found');
     }
 };
 
@@ -36,22 +36,22 @@ const startWork = async (req: Request, res: Response) => {
 
     const user = await userModel.findOne({ username: username });
 
-    const projects = await projectModel.find({ isStopped: false });
+    const tasks = await taskModel.find({ isStopped: false });
 
     if (!user) return res.status(200).json('user not found');
-    if (projects.length > 0) return res.status(422).json(`please stop any not finished work`);
+    if (tasks.length > 0) return res.status(422).json(`please stop any not finished work`);
 
     try {
-        const project = new projectModel({
+        const task = new taskModel({
             description: description,
             userRef: user._id
         });
 
-        user.projectsRef.push(project._id);
+        user.tasksRef.push(task._id);
         run();
-        await project.save().then(async () => await user.save());
+        await task.save().then(async () => await user.save());
 
-        res.status(201).json(project);
+        res.status(201).json(task);
     } catch (error) {
         res.status(422).json(error);
     }
@@ -63,20 +63,20 @@ const stopWork = async (req: Request, res: Response) => {
 
     const user: any = await userModel.findOne({ username: username });
 
-    const project = await projectModel.findOne({ description: description, isStopped: false, userRef: user._id });
+    const task = await taskModel.findOne({ description: description, isStopped: false, userRef: user._id });
 
     if (!user) return res.status(200).json('user not found');
-    if (!project) return res.status(200).json('project is not found or already stopped');
+    if (!task) return res.status(200).json('task is not found or already stopped');
 
     try {
         stop();
-        project.isStopped = true;
-        project.finishDate = new Date().toUTCString();
-        project.workingTime = workingTime;
+        task.isStopped = true;
+        task.finishDate = new Date().toUTCString();
+        task.workingTime = workingTime;
 
-        await project.save();
+        await task.save();
 
-        res.status(200).json(project);
+        res.status(200).json(task);
     } catch (error) {
         res.status(422).json(error);
     }
@@ -92,21 +92,21 @@ const exportWork = async (req: Request, res: Response) => {
 
     if (!user) return res.status(200).json('user not found');
 
-    const projects = await projectModel.find({ userRef: user._id, isStopped: true });
+    const tasks = await taskModel.find({ userRef: user._id, isStopped: true });
 
-    if (projects.length < 1) return res.status(200).json('no previous work yet');
+    if (tasks.length < 1) return res.status(200).json('no previous work yet');
 
     const totalWork: object[] = [];
 
-    for (let i = 0; i < projects.length; i++) {
-        const alreadyWorkedDay: any = totalWork.find((e: any) => e.date === projects[i].startDate.substring(0, 16));
+    for (let i = 0; i < tasks.length; i++) {
+        const alreadyWorkedDay: any = totalWork.find((e: any) => e.date === tasks[i].startDate.substring(0, 16));
 
         if (alreadyWorkedDay) {
-            alreadyWorkedDay.totalWorkTime += projects[i].workingTime;
+            alreadyWorkedDay.totalWorkTime += tasks[i].workingTime;
         } else {
             const singleDay = {
-                date: projects[i].startDate.substring(0, 16),
-                totalWorkTime: projects[i].workingTime,
+                date: tasks[i].startDate.substring(0, 16),
+                totalWorkTime: tasks[i].workingTime,
                 username: user.username
             };
             totalWork.push(singleDay);
@@ -123,11 +123,11 @@ const exportWork = async (req: Request, res: Response) => {
     });
 
     const csvWriter = createCsvWriter({
-        path: 'src/work.csv',
+        path: 'src/tasks.csv',
         header: [
             { id: 'date', title: 'DATE' },
-            { id: 'totalWork', title: 'TOTAL WORK' },
-            { id: 'username', title: 'USERNAME' }
+            { id: 'username', title: 'USER' },
+            { id: 'totalWork', title: 'TOTAL TIME SPENT' },
         ]
     });
 
@@ -139,19 +139,19 @@ const exportWork = async (req: Request, res: Response) => {
 };
 
 const deleteWork = async (req: Request, res: Response) => {
-    const projectID = req.params.id;
+    const taskID = req.params.id;
 
-    const project = await projectModel.findOne({ _id: projectID });
+    const task = await taskModel.findOne({ _id: taskID });
 
-    if (project) {
-        await projectModel.findByIdAndDelete(projectID).then(() => {
+    if (task) {
+        await taskModel.findByIdAndDelete(taskID).then(() => {
             res.status(200).json('work deleted successfully');
         }).catch(() => {
             res.status(422).json('could not delete this work');
         });
     } else {
-        res.status(200).json('project not found');
+        res.status(200).json('task not found');
     }
 };
 
-export { getProjects, startWork, stopWork, exportWork, deleteWork };
+export { gettasks, startWork, stopWork, exportWork, deleteWork };

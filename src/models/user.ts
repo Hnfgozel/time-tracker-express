@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 interface User {
     username: string;
-    projectsRef: object[];
+    tasksRef: object[];
 }
 
 const UserSchema = new Schema<User>({
@@ -11,11 +11,11 @@ const UserSchema = new Schema<User>({
         required: true,
         unique: true
     },
-    projectsRef: {
+    tasksRef: {
         type: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'projects',
+                ref: 'tasks',
             },
         ],
         default: [],

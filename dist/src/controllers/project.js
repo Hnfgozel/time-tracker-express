@@ -12,20 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteWork = exports.exportWork = exports.stopWork = exports.startWork = exports.getProjects = void 0;
+exports.deleteWork = exports.exportWork = exports.stopWork = exports.startWork = exports.gettasks = void 0;
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-const project_1 = __importDefault(require("../models/project"));
+const task_1 = __importDefault(require("../models/task"));
 const user_1 = __importDefault(require("../models/user"));
-const getProjects = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const projects = yield project_1.default.find({}).populate('userRef').exec();
-    if (projects.length > 0) {
-        res.status(200).json(projects);
+const gettasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const tasks = yield task_1.default.find({}).populate('userRef').exec();
+    if (tasks.length > 0) {
+        res.status(200).json(tasks);
     }
     else {
-        res.status(200).json('projects not found');
+        res.status(200).json('tasks not found');
     }
 });
-exports.getProjects = getProjects;
+exports.gettasks = gettasks;
 let workingTime = 0;
 let timerTask;
 const count = () => {
@@ -42,20 +42,20 @@ const stop = () => {
 const startWork = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, description } = req.body;
     const user = yield user_1.default.findOne({ username: username });
-    const projects = yield project_1.default.find({ isStopped: false });
+    const tasks = yield task_1.default.find({ isStopped: false });
     if (!user)
         return res.status(200).json('user not found');
-    if (projects.length > 0)
+    if (tasks.length > 0)
         return res.status(422).json(`please stop any not finished work`);
     try {
-        const project = new project_1.default({
+        const task = new task_1.default({
             description: description,
             userRef: user._id
         });
-        user.projectsRef.push(project._id);
+        user.tasksRef.push(task._id);
         run();
-        yield project.save().then(() => __awaiter(void 0, void 0, void 0, function* () { return yield user.save(); }));
-        res.status(201).json(project);
+        yield task.save().then(() => __awaiter(void 0, void 0, void 0, function* () { return yield user.save(); }));
+        res.status(201).json(task);
     }
     catch (error) {
         res.status(422).json(error);
@@ -65,18 +65,18 @@ exports.startWork = startWork;
 const stopWork = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, description } = req.body;
     const user = yield user_1.default.findOne({ username: username });
-    const project = yield project_1.default.findOne({ description: description, isStopped: false, userRef: user._id });
+    const task = yield task_1.default.findOne({ description: description, isStopped: false, userRef: user._id });
     if (!user)
         return res.status(200).json('user not found');
-    if (!project)
-        return res.status(200).json('project is not found or already stopped');
+    if (!task)
+        return res.status(200).json('task is not found or already stopped');
     try {
         stop();
-        project.isStopped = true;
-        project.finishDate = new Date().toUTCString();
-        project.workingTime = workingTime;
-        yield project.save();
-        res.status(200).json(project);
+        task.isStopped = true;
+        task.finishDate = new Date().toUTCString();
+        task.workingTime = workingTime;
+        yield task.save();
+        res.status(200).json(task);
     }
     catch (error) {
         res.status(422).json(error);
@@ -90,19 +90,19 @@ const exportWork = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const user = yield user_1.default.findOne({ username: username });
     if (!user)
         return res.status(200).json('user not found');
-    const projects = yield project_1.default.find({ userRef: user._id, isStopped: true });
-    if (projects.length < 1)
+    const tasks = yield task_1.default.find({ userRef: user._id, isStopped: true });
+    if (tasks.length < 1)
         return res.status(200).json('no previous work yet');
     const totalWork = [];
-    for (let i = 0; i < projects.length; i++) {
-        const alreadyWorkedDay = totalWork.find((e) => e.date === projects[i].startDate.substring(0, 16));
+    for (let i = 0; i < tasks.length; i++) {
+        const alreadyWorkedDay = totalWork.find((e) => e.date === tasks[i].startDate.substring(0, 16));
         if (alreadyWorkedDay) {
-            alreadyWorkedDay.totalWorkTime += projects[i].workingTime;
+            alreadyWorkedDay.totalWorkTime += tasks[i].workingTime;
         }
         else {
             const singleDay = {
-                date: projects[i].startDate.substring(0, 16),
-                totalWorkTime: projects[i].workingTime,
+                date: tasks[i].startDate.substring(0, 16),
+                totalWorkTime: tasks[i].workingTime,
                 username: user.username
             };
             totalWork.push(singleDay);
@@ -128,17 +128,17 @@ const exportWork = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.exportWork = exportWork;
 const deleteWork = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const projectID = req.params.id;
-    const project = yield project_1.default.findOne({ _id: projectID });
-    if (project) {
-        yield project_1.default.findByIdAndDelete(projectID).then(() => {
+    const taskID = req.params.id;
+    const task = yield task_1.default.findOne({ _id: taskID });
+    if (task) {
+        yield task_1.default.findByIdAndDelete(taskID).then(() => {
             res.status(200).json('work deleted successfully');
         }).catch(() => {
             res.status(422).json('could not delete this work');
         });
     }
     else {
-        res.status(200).json('project not found');
+        res.status(200).json('task not found');
     }
 });
 exports.deleteWork = deleteWork;

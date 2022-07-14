@@ -2,9 +2,9 @@ import express from 'express';
 
 const router = express.Router();
 
-import { getProjects, startWork, stopWork, exportWork, deleteWork } from '../controllers/project';
+import { gettasks, startWork, stopWork, exportWork, deleteWork } from '../controllers/task';
 
-router.get("/", getProjects);
+router.get("/", gettasks);
 router.post("/start", startWork);
 router.post("/stop", stopWork);
 router.post("/export", exportWork);
