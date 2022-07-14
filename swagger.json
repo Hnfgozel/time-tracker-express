@@ -1,0 +1,304 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Time Tracker Express API",
+    "description": "Task Express Api",
+
+    "contact": {
+      "name": "Hanifi Gözel",
+      "url": "https://github.com/Hnfgozel",
+      "email": "gozel.hanifi@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Localhost"
+    }
+
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Users endpoints"
+    },
+    {
+      "name": "Projects",
+      "description": "Projects endpoints"
+    }
+  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users in database",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create a new user",
+        "requestBody": {
+          "description": "User Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "201": {
+            "description": "OK New user created",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "422": {
+            "description": "Failed to create user"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "user ID",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "summary": "Delete user by id",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Delete user by id",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Get all projects in database",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Projects"
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/start": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Create a new work",
+        "requestBody": {
+          "description": "Project Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Project"
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "User not found",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "201": {
+            "description": "OK New work created",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "422": {
+            "description": "Please stop any not finished work"
+          }
+        }
+      }
+    },
+    "/api/projects/stop": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Stop work",
+        "requestBody": {
+          "description": "Project Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Project"
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "User not found / Work is already stopped",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "422": {
+            "description": "Could not stop work"
+          }
+        }
+      }
+    },
+    "/api/projects/export": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Export work data",
+        "requestBody": {
+          "description": "Project Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Project"
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK / User not found / No work yet",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "422": {
+            "description": "Missing username field"
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "project ID",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "summary": "Delete work by id",
+        "tags": ["Projects"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Delete work by id",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "id": {
+      "properties": {
+        "uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "projectsRef": {
+          "type": "array"
+        }
+      }
+    },
+    "Users": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      }
+    },
+    "Project": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "Projects": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Project"
+          }
+        }
+      }
+    }
+  }
+}
