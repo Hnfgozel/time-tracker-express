@@ -1,6 +1,6 @@
 ﻿# time-tracker-express
 
-working time tracker
+App to track how much time spent on tasks
 
 ### how to run this project
 - clone the repository
